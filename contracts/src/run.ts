@@ -7,7 +7,7 @@ let aesZKProgram = ZkProgram({
   publicInput: Byte16,
 
   methods: {
-    baseCase: {
+    verifyAES128: {
       privateInputs: [Byte16, Byte16],
 
       async method(cipher: Byte16, message: Byte16, key: Byte16) {
