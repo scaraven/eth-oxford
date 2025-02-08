@@ -3,7 +3,7 @@ import { Byte16 } from "../primitives/Bytes.js";
 import { sbox } from "./SBox.js";
 import { shiftRows } from "./ShiftRows.js"
 import { FieldList } from "../utils/list.js";
-import { gmixColumn } from "./MixColumns.js";
+import { gmixColumn, mixColumn } from "./MixColumns.js";
 
 class AESProof extends Proof<Byte16, Byte16> {};
 
@@ -24,13 +24,9 @@ class AES extends SmartContract {
     return sbox(input);
   }
 
-    // TODO: Not correct
-    @method.returns(FieldList)
-    async mixColumns(input: Byte16): Promise<FieldList> {
-        let list = FieldList.empty();
-        list.push(input.top);
-        list.push(input.bot);
-        return gmixColumn(list);
+    @method.returns(Byte16)
+    async mixColumns(input: Byte16): Promise<Byte16> {
+        return mixColumn(input);
     }
     
     @method.returns(Byte16)

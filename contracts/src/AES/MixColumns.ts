@@ -1,4 +1,5 @@
 import {
+  Bool,
   Field,
   Gadgets,
   Provable,
@@ -6,8 +7,27 @@ import {
 import { Byte16 } from '../primitives/Bytes.js';
 import { FieldList } from '../utils/list.js';
 
-function MixColumn(input: Byte16): Byte16 {
-  return input;
+export function mixColumn(input: Byte16): Byte16 {
+
+    let top = Field(0)
+    let bot = Field(0)
+
+    for (let j = 0; j < 4; ++j) {
+        let col = FieldList.empty();
+        for (let i = 3; i >= 0; --i) {
+            let inp = Provable.if(new Bool (i < 2), input.bot, input.top);
+            let shift = 24 + (i%2)*32 - j*8;
+            let mask = Gadgets.leftShift64(Field(0xff), shift);
+            col.push(Gadgets.rightShift64(Gadgets.and(mask, inp, 64), shift));
+        }
+        let mixCol: FieldList = gmixColumn(col);
+        // just do the loop for the output manually by popping off of mixCol
+        bot = Gadgets.or(Gadgets.leftShift64(mixCol.pop(),      24 - 8*j), bot, 64);
+        bot = Gadgets.or(Gadgets.leftShift64(mixCol.pop(), 32 + 24 - 8*j), bot, 64);
+        top = Gadgets.or(Gadgets.leftShift64(mixCol.pop(),      24 - 8*j), top, 64);
+        top = Gadgets.or(Gadgets.leftShift64(mixCol.pop(), 32 + 24 - 8*j), top, 64);
+    }
+    return new Byte16(top, bot);
 }
 
 function xor8(a: Field, b: Field): Field {

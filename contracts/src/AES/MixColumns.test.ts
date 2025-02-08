@@ -1,6 +1,7 @@
 import { Field } from "o1js";
-import { gmixColumn } from "./MixColumns";
+import { mixColumn, gmixColumn } from "./MixColumns";
 import { FieldList } from "../utils/list";
+import { Byte16 } from "../primitives/Bytes";
 
 describe("GMixColumns", () => {
     // Examples taken from: https://www.samiam.org/mix-column.html
@@ -30,4 +31,27 @@ describe("GMixColumns", () => {
         const num6 = gmixColumn(input6);
         expect(num6.toArrayUnconstrained().get()).toEqual([Field(0x4d), Field(0x7e), Field(0xbd), Field(0xf8)]);
     });
+
+
+  it("Generates correct key for whole matrix inputs", async () => {
+    const input = Byte16.fromBytes([
+      0xdb, 0xf2, 0x01, 0xc6, 
+      0x13, 0x0a, 0x01, 0xc6,
+      0x53, 0x22, 0x01, 0xc6,
+      0x45, 0x5c, 0x01, 0xc6,
+    ]);
+    const num = mixColumn(input);
+    expect(num.toField().toBigInt().toString(16)).toEqual('8e9f01c64ddc01c6a15801c6bc9d01c6');
+    // input transposed
+    // 0xdb, 0x13, 0x53, 0x45,
+    // 0xf2, 0x0a, 0x22, 0x5c,
+    // 0x01, 0x01, 0x01, 0x01,
+    // 0xc6, 0xc6, 0xc6, 0xc6,
+
+    // output transposed
+    // 8e 4d a1 bc
+    // 9f dc 58 9d
+    // 01 01 01 01
+    // c6 c6 c6 c6
+  })
 });
