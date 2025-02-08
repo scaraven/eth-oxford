@@ -1,5 +1,8 @@
-import { Field, Gadgets } from "o1js";
-import { FieldList } from "../utils/list";
+import { Field, Gadgets, Provable, Struct } from "o1js";
+
+class SBoxArr extends Struct({
+    value: Provable.Array(Field, 256)
+}) {}
 
 const sbox_arr = [
     Field(0x63), Field(0x7C), Field(0x77), Field(0x7B), Field(0xF2), Field(0x6B), Field(0x6F), Field(0xC5), Field(0x30), Field(0x01), Field(0x67), Field(0x2B), Field(0xFE), Field(0xD7), Field(0xAB), Field(0x76),
@@ -23,7 +26,7 @@ const sbox_arr = [
 function sbox(input: Field): Field {
     let output: Field = Field(0);
 
-    const sboxList = FieldList.from(sbox_arr);
+    let sbox = new SBoxArr({ value: sbox_arr });
 
     for (let i = 0; i < 8; i++) {
         // Take the corresponding byte from 
@@ -32,13 +35,10 @@ function sbox(input: Field): Field {
         let byte = Gadgets.and(shifted, Field(0xff), 64);
         let byte_output = Field(0);
 
-       let iterator = sboxList.startIterating();
         for (let j = 0; j < 256; j++) {
-            // Get iterator value
-            let value = iterator.next()
             // This is either 0 or 1, depending on whether we have accessed the correct index
-            let correct_index = byte.equals(1).toField();
-            byte_output = byte_output.add(value.mul(correct_index));
+            let correct_index = byte.equals(Field(j)).toField();
+            byte_output = byte_output.add(sbox.value[j].mul(correct_index));
         }
         // Transform byte_output to the correct position
         byte_output = Gadgets.leftShift64(byte_output, i * 8);
@@ -47,5 +47,6 @@ function sbox(input: Field): Field {
 
     return output;
 }
+
 
 export { sbox };

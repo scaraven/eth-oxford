@@ -14,7 +14,6 @@ class AES extends SmartContract {
         return input;
     }
 
-    /*
     @method.returns(Byte16)
     async sbox(input: Byte16): Promise<Byte16> {
         // Get top 64 bits
@@ -23,7 +22,6 @@ class AES extends SmartContract {
 
         return new Byte16(enc_top, enc_bot);
     }
-        */
 
     @method.returns(Byte16)
     async mixColumns(input: Byte16): Promise<Byte16> {
