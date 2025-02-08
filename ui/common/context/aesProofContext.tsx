@@ -29,11 +29,9 @@ export const AesProofProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const setup = async () => {
       try {
-        console.log("Loading the worker...");
         const client = new AesWorkerClient();
         setAesWorkerClient(client);
 
-        console.log("Loading the contract...");
         await client.loadContract();
 
         console.log("Compiling the contract...");
@@ -54,6 +52,7 @@ export const AesProofProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!aesWorkerClient) {
         throw new Error("aesWorkerClient not initialized");
       }
+
       return await aesWorkerClient.encrypt(message, aesKey).toString();
     },
     [aesWorkerClient]

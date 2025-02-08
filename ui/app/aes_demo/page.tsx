@@ -9,12 +9,12 @@ const AESDemoPage = () => {
         buttonText="Encrypt"
         processType="encrypt"
       />
-      <MessageProcessor
+      {/* <MessageProcessor
         title="AES Decryption"
         buttonText="Decrypt"
         processType="decrypt"
         bgClass="bg-teal-100"
-      />
+      /> */}
     </AesProofProvider>
   );
 };
