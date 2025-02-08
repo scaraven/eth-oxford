@@ -1,6 +1,7 @@
 import { Field, MerkleList, method, SmartContract } from "o1js";
 import { Byte16 } from "../primitives/Bytes";
 import { sbox } from "./SBox";
+import { shiftRows } from "./ShiftRows"
 
 class AES extends SmartContract {
     @method.returns(Byte16)
@@ -13,6 +14,7 @@ class AES extends SmartContract {
         return input;
     }
 
+    /*
     @method.returns(Byte16)
     async sbox(input: Byte16): Promise<Byte16> {
         // Get top 64 bits
@@ -21,10 +23,16 @@ class AES extends SmartContract {
 
         return new Byte16(enc_top, enc_bot);
     }
+        */
 
     @method.returns(Byte16)
     async mixColumns(input: Byte16): Promise<Byte16> {
         return input;
+    }
+    
+    @method.returns(Byte16)
+    async shiftRows(input: Byte16): Promise<Byte16> {
+        return shiftRows(input);
     }
 }
 

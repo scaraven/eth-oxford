@@ -1,15 +1,9 @@
-import { Field, Gadgets, Provable } from "o1js";
+import { Circuit, Field, Gadgets, Bool, circuitMain, Provable, MerkleList } from "o1js";
 import { Byte16 } from "../primitives/Bytes"
 import { FieldList } from "../utils/list";
 
-function MixColumnSingle(input: Byte16): Byte16 {
-    // Conver input into columns
-    let columns = input.toColumns();
-    let out: Field[][] = [];
-    for (let i = 0; i < 4; i++) {
-        out.push(gmixColumn(columns[i]));
-    }
-    return Byte16.fromColumns(out);
+function MixColumn(input: Byte16): Field {
+    return input.top;
 }
 
 function xor8(a: Field, b: Field): Field {
@@ -20,13 +14,14 @@ function xor8_5(a: Field, b: Field, c: Field, d: Field, e: Field): Field {
     return xor8(xor8(xor8(xor8(a, b), c), d), e);
 }
 
-// TODO: Modify Field[] into MerkleListBase
-export function gmixColumn(r: Field[]): Field[] {
-    let a: Field[] = []
-    let b: Field[] = []
+export function gmixColumn(r: FieldList): FieldList {
+    let a = FieldList.empty();
+    let b = FieldList.empty();
     
+    // Process each byte in the column.
+    let iterator = r.startIterating();
     for (let c = 0; c < 4; c++) {
-      let value = r[c];
+      let value = iterator.next();
       value.assertLessThanOrEqual(Field(0xff));
       
       a.push(value);
@@ -42,14 +37,25 @@ export function gmixColumn(r: Field[]): Field[] {
     
       b.push(Gadgets.and(b_val, Field(0xff), 8));
     }
+
+    // Harcode :(
+    const b_3 = b.pop();
+    const b_2 = b.pop();
+    const b_1 = b.pop();
+    const b_0 = b.pop();
+
+    const a_3 = a.pop();
+    const a_2 = a.pop();
+    const a_1 = a.pop();
+    const a_0 = a.pop();
     
     // Now compute the new column bytes.
     // The C code uses XOR (^) to combine values.
     // We assume our helper xor8 (and xor8_5) performs an 8-bit XOR.
-    const r0 = xor8_5(b[0], a[3], a[2], b[1], a[1]);
-    const r1 = xor8_5(b[1], a[0], a[3], b[2], a[2]);
-    const r2 = xor8_5(b[2], a[1], a[0], b[3], a[3]);
-    const r3 = xor8_5(b[3], a[2], a[1], b[0], a[0]);
+    const r0 = xor8_5(b_0, a_3, a_2, b_1, a_1);
+    const r1 = xor8_5(b_1, a_0, a_3, b_2, a_2);
+    const r2 = xor8_5(b_2, a_1, a_0, b_3, a_3);
+    const r3 = xor8_5(b_3, a_2, a_1, b_0, a_0);
 
-    return [r0, r1, r2, r3];
+    return FieldList.from([r0, r1, r2, r3]);
 }
