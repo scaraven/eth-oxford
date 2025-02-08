@@ -1,9 +1,9 @@
 import { Field, MerkleList, method, SmartContract } from "o1js";
-import { Byte16 } from "../primitives/Bytes";
-import { sbox } from "./SBox";
-import { shiftRows } from "./ShiftRows"
-import { FieldList } from "../utils/list";
-import { gmixColumn } from "./MixColumns";
+import { Byte16 } from "../primitives/Bytes.js";
+import { sbox } from "./SBox.js";
+import { shiftRows } from "./ShiftRows.js"
+import { FieldList } from "../utils/list.js";
+import { gmixColumn } from "./MixColumns.js";
 
 function encrypt(message: Byte16, key: Byte16) {
     return message;

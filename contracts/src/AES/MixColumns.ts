@@ -1,14 +1,10 @@
 import {
-  Circuit,
   Field,
   Gadgets,
-  Bool,
-  circuitMain,
   Provable,
-  MerkleList,
 } from 'o1js';
-import { Byte16 } from '../primitives/Bytes';
-import { FieldList } from '../utils/list';
+import { Byte16 } from '../primitives/Bytes.js';
+import { FieldList } from '../utils/list.js';
 
 function MixColumn(input: Byte16): Byte16 {
   return input;
