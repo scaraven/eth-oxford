@@ -6,7 +6,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { MyProgram } from "../../../contracts/build/src/Example/Program";
+import AesWorkerClient from "../workers/aes/AesWorkerClient";
 
 type AesProofContextType = {
   getEncryptionProof: (message: string, aesKey: string) => Promise<string>;
@@ -22,15 +22,24 @@ export const AesProofProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [zkInstance, setZkInstance] = useState<typeof MyProgram>();
+  const [aesWorkerClient, setAesWorkerClient] = useState<
+    AesWorkerClient | undefined
+  >();
 
   useEffect(() => {
     const setup = async () => {
       try {
-        console.log("Compiling contract...");
-        const newInstance = MyProgram;
-        await newInstance.compile();
-        setZkInstance(newInstance);
+        console.log("Loading the worker...");
+        const client = new AesWorkerClient();
+        setAesWorkerClient(client);
+
+        console.log("Loading the contract...");
+        await client.loadContract();
+
+        console.log("Compiling the contract...");
+        await client.compileContract();
+
+        console.log("Worker and contract are ready!");
         setIsLoading(false);
       } catch (error) {
         alert("Failed to compile contract");
@@ -42,22 +51,22 @@ export const AesProofProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const getEncryptionProof = useCallback(
     async (message: string, aesKey: string): Promise<string> => {
-      if (!zkInstance) {
-        throw new Error("zkInstance not initialized");
+      if (!aesWorkerClient) {
+        throw new Error("aesWorkerClient not initialized");
       }
-      return await zkInstance.baseCase().toString();
+      return await aesWorkerClient.encrypt(message, aesKey).toString();
     },
-    [zkInstance]
+    [aesWorkerClient]
   );
 
   const getDecryptionProof = useCallback(
     async (message: string, aesKey: string): Promise<string> => {
-      if (!zkInstance) {
-        throw new Error("zkInstance not initialized");
+      if (!aesWorkerClient) {
+        throw new Error("aesWorkerClient not initialized");
       }
-      return await zkInstance.baseCase().toString();
+      return await aesWorkerClient.decrypt(message, aesKey).toString();
     },
-    [zkInstance]
+    [aesWorkerClient]
   );
 
   return (

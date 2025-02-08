@@ -1,20 +1,31 @@
 import * as Comlink from "comlink";
 // import type { AES } from "../../../../contracts/src/AES/AES";
-import { MyProgram } from "../../../../contracts/build/src/Example/Program.js";
+import type { MyProgram } from "../../../../contracts/src/Example/Program";
 
 const state = {
-  AESInstance: MyProgram,
+  AESInstance: null as null | typeof MyProgram,
 };
 
 interface Api {
+  loadContract: () => Promise<void>;
   compileContract: () => void;
   encrypt: (message: string, aesKey: string) => Promise<string>;
   decrypt: (message: string, aesKey: string) => Promise<string>;
 }
 
 export const api: Api = {
+  async loadContract() {
+    const { MyProgram } = await import(
+      "../../../../contracts/build/src/Example/Program"
+    ); //import("../../../../contracts/build/src/AES/AES.js");
+    state.AESInstance = MyProgram;
+  },
+
   async compileContract() {
-    await state.AESInstance.compile();
+    if (!state.AESInstance) {
+      throw new Error("Contract not loaded");
+    }
+    await state.AESInstance.compile({ proofsEnabled: true });
   },
 
   async encrypt(message: string, aesKey: string) {
