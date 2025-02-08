@@ -16,7 +16,11 @@ class AES extends SmartContract {
     @method.returns(Byte16)
     async sbox(input: Byte16): Promise<Byte16> {
         // Get top 64 bits
-        return sbox(input.value);
+
+        const enc_top = sbox(input.top);
+        const enc_bot = sbox(input.bot);
+
+        return new Byte16(enc_top, enc_bot);
     }
 }
 

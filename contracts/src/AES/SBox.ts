@@ -1,9 +1,8 @@
 import { Field, Gadgets, MerkleList, MerkleListIterator, Provable } from "o1js";
-import { Byte16 } from "../primitives/Bytes";
 
 class SBoxList extends MerkleList.create(Field) {}
 
-function sbox(input: Field): Byte16 {
+function sbox(input: Field): Field {
     let output: Field = Field(0);
     const sbox = [
         Field(0x63), Field(0x7C), Field(0x77), Field(0x7B), Field(0xF2), Field(0x6B), Field(0x6F), Field(0xC5), Field(0x30), Field(0x01), Field(0x67), Field(0x2B), Field(0xFE), Field(0xD7), Field(0xAB), Field(0x76),
@@ -47,7 +46,7 @@ function sbox(input: Field): Byte16 {
         output = output.add(byte_output);
     }
 
-    return new Byte16(output);
+    return output;
 }
 
 export { sbox };

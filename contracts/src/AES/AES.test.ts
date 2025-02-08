@@ -45,7 +45,7 @@ describe("AES", () => {
     const input = Byte16.fromBytes([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 ,0x00, 0x00, 0xde, 0xad]);
 
     const num = await zkApp.sbox(input);
-    expect(num.value).toEqual(Field(0x6363636363631D95n));
+    expect(num.toField()).toEqual(Field(0x63636363636363636363636363631D95n));
   });
 
   it("generates correct key for 4 bytes input", async () => {
@@ -53,7 +53,7 @@ describe("AES", () => {
 
     const input = Byte16.fromBytes([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 ,0xde, 0xad, 0xbe, 0xef]);
     const num = await zkApp.sbox(input);
-    expect(num.value).toEqual(Field(0x636363631D95AEDFn));
+    expect(num.toField()).toEqual(Field(0x6363636363636363636363631D95AEDFn));
   });
 
   it("generates correct key for 16 bytes input", async () => {
@@ -61,7 +61,7 @@ describe("AES", () => {
 
     const input = Byte16.fromBytes([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C ,0x0D, 0x0E, 0x0F, 0x10]);
     const num = await zkApp.sbox(input);
-    expect(num.value).toEqual(Field(0x7C777BF26B6FC53001672BFED7AB76n));
+    expect(num.toField()).toEqual(Field(0x7C777BF26B6FC53001672BFED7AB76CAn));
   });
 
 });

@@ -4,15 +4,17 @@ import { Field, Struct, Gadgets } from 'o1js';
  * A struct that represents 16 bytes packed into a single Field element.
  */
 export class Byte16 extends Struct({
-  value: Field
+  top: Field,
+  bot: Field
 }) {
   // 2^128 as a Field constant for constraint checks
-  static readonly TWO128 = Field(BigInt(1) << BigInt(128));
+  static readonly TWO64 = Field(BigInt(1) << BigInt(64));
 
-  constructor(value: Field) {
-    super({ value });
-    // Ensure the value is less than 2^128 to fit within 16 bytes
-    value.assertLessThan(Byte16.TWO128);
+  constructor(top: Field, bot: Field) {
+    super({ top, bot });
+    // Ensure each section is less than 2^64 to fit within 8 bytes
+    top.assertLessThan(Byte16.TWO64);
+    bot.assertLessThan(Byte16.TWO64);
   }
 
   /**
@@ -24,14 +26,21 @@ export class Byte16 extends Struct({
     if (bytes.length !== 16) {
       throw new Error(`Expected 16 bytes, but got ${bytes.length}.`);
     }
-    let combinedValue = BigInt(0);
-    for (const byte of bytes) {
+    let top = BigInt(0);
+    let bot = BigInt(0);
+    for (let i = 0; i < 16; i++) {
+      let byte = bytes[i];
       if (byte < 0 || byte > 255) {
         throw new Error(`Byte value ${byte} is out of range. Must be between 0 and 255.`);
       }
-      combinedValue = (combinedValue << BigInt(8)) | BigInt(byte);
+
+      if (i < 8) {
+        top = (top << BigInt(8)) | BigInt(byte);
+      } else {
+        bot = (bot << BigInt(8)) | BigInt(byte);
+      }
     }
-    return new Byte16(Field(combinedValue));
+    return new Byte16(Field(top), Field(bot));
   }
 
   /**
@@ -39,18 +48,23 @@ export class Byte16 extends Struct({
    * @returns An array of 16 numbers, each between 0 and 255.
    */
   toBytes(): number[] {
-    let value = this.value.toBigInt();
+    let top = this.top.toBigInt();
+    let bot = this.bot.toBigInt();
     const bytes = new Array<number>(16);
     for (let i = 15; i >= 0; i--) {
-      bytes[i] = Number(value & BigInt(0xff));
-      value >>= BigInt(8);
+      if (i < 8) {
+        bytes[i] = Number(top & BigInt(0xff));
+        top >>= BigInt(8);
+      } else {
+        bytes[i] = Number(bot & BigInt(0xff));
+        bot >>= BigInt(8);
+      }
     }
     return bytes;
   }
 
-  toJSON() {
-    // Convert the underlying Field (and its BigInt) to a string.
-    return { value: this.value.toString() };
+  toField(): Field {
+    return this.bot.add(this.top.mul(Byte16.TWO64));
   }
 
   /**
@@ -61,6 +75,6 @@ export class Byte16 extends Struct({
    */
   static xor(a: Byte16, b: Byte16): Byte16 {
     // AES uses 128 bit sizes for all operations
-    return new Byte16(Gadgets.xor(a.value, b.value, 128));
+    return new Byte16(Gadgets.xor(a.top, b.top, 64), Gadgets.xor(a.bot, b.bot, 64));
   }
 }

@@ -38,7 +38,7 @@ describe("Bytes", () => {
         const byteArray = [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 ,0x00, 0x00, 0xde, 0xad];
 
         const byte16Instance = Byte16.fromBytes(byteArray);
-        expect(byte16Instance.value).toEqual(Field(0xdead));
-        expect(byte16Instance.value).toEqual(Field(57005));
+        expect(byte16Instance.toField()).toEqual(Field(0xdead));
+        expect(byte16Instance.toField()).toEqual(Field(57005));
     });
 });
