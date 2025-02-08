@@ -1,17 +1,40 @@
-import { Provable, ZkProgram } from 'o1js';
+import { Provable, Struct, ZkProgram } from 'o1js';
 import { Byte16 } from './primitives/Bytes.js';
+import { addRoundKey } from './AES/AddRoundKey.js';
+import { shiftRows } from './AES/ShiftRows.js';
+import { sbox } from './AES/SBox.js';
+import { MixColumn } from './AES/MixColumns.js';
+
+class AESPublicInput extends Struct({
+  cipher: Byte16,
+}) {}
+
+const NUM_ROUNDS = 10;
 
 let aesZKProgram = ZkProgram({
   name: 'aes-verify',
-  publicInput: Byte16,
+  publicInput: AESPublicInput,
 
   methods: {
     verifyAES128: {
-      privateInputs: [Byte16, Byte16],
+      privateInputs: [Byte16, Provable.Array(Byte16, NUM_ROUNDS)],
 
-      async method(cipher: Byte16, message: Byte16, key: Byte16) {
-        let out = message;
-        Provable.assertEqual(Byte16, out, cipher);
+      async method(input: AESPublicInput, message: Byte16, roundKeys: Byte16[]) {
+        let state = message;
+
+        state = addRoundKey(state, roundKeys[0]);
+
+        for (let i = 1; i < NUM_ROUNDS - 1; i++) {
+          state = sbox(state);
+          state = shiftRows(state);
+          state = MixColumn(state);
+          state = addRoundKey(state, roundKeys[i]);
+        }
+        state = sbox(state);
+        state = shiftRows(state);
+        state = addRoundKey(state, roundKeys[NUM_ROUNDS - 1]);
+
+        return state.assertEquals(input.cipher);
       },
     },
   },
@@ -42,9 +65,10 @@ const cipher = Byte16.fromBytes([
 console.timeEnd('generate inputs');
 
 console.time('prove');
-let { proof } = await aesZKProgram.verifyAES128(message, key, cipher);
+let { proof } = await aesZKProgram.verifyAES128(new AESPublicInput({ cipher }), message, key);
 console.timeEnd('prove');
 
 console.time('verify');
 await aesZKProgram.verify(proof);
 console.timeEnd('verify');
+
