@@ -1,4 +1,4 @@
-import { Field, Struct } from 'o1js';
+import { Field, Struct, Gadgets } from 'o1js';
 
 /**
  * A struct that represents 16 bytes packed into a single Field element.
@@ -46,5 +46,16 @@ export class Byte16 extends Struct({
       value >>= BigInt(8);
     }
     return bytes;
+  }
+
+  /**
+   * Perform XOR operation between two Byte values.
+   * @param a First Byte struct.
+   * @param b Second Byte struct.
+   * @returns A new Byte struct representing the XOR result.
+   */
+  static xor(a: Byte16, b: Byte16): Byte16 {
+    // AES uses 128 bit sizes for all operations
+    return new Byte16(Gadgets.xor(a.value, b.value, 128));
   }
 }
