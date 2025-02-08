@@ -48,5 +48,13 @@ describe("AES", () => {
     expect(num.toField()).toEqual(Field(0x7C777BF26B6FC53001672BFED7AB76CAn));
   });
 
+  it("test expected outcome of shiftRows", async () => {
+    await localDeploy();
+
+    const input = Byte16.fromBytes([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C ,0x0D, 0x0E, 0x0F, 0x10]);
+    const num = await zkApp.shiftRows(input);
+    expect(num.toField().toBigInt().toString(16)).toEqual('1020304060708050b0c090a100d0e0f'); // quick hack for output in hex
+  })
+
 });
 

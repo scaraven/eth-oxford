@@ -1,6 +1,7 @@
 import { Field, method, SmartContract } from "o1js";
 import { Byte16 } from "../primitives/Bytes";
 import { sbox } from "./SBox";
+import { shiftRows } from "./ShiftRows"
 
 class AES extends SmartContract {
     @method.returns(Byte16)
@@ -21,6 +22,11 @@ class AES extends SmartContract {
         const enc_bot = sbox(input.bot);
 
         return new Byte16(enc_top, enc_bot);
+    }
+
+    @method.returns(Byte16)
+    async shiftRows(input: Byte16): Promise<Byte16> {
+        return shiftRows(input);
     }
 }
 
