@@ -1,8 +1,9 @@
 import MessageProcessor from "../../common/components/MessageProccessor";
+import { AesProofProvider } from "../../common/context/aesProofContext";
 
 const AESDemoPage = () => {
   return (
-    <>
+    <AesProofProvider>
       <MessageProcessor
         title="AES Encryption"
         buttonText="Encrypt"
@@ -14,7 +15,7 @@ const AESDemoPage = () => {
         processType="decrypt"
         bgClass="bg-teal-100"
       />
-    </>
+    </AesProofProvider>
   );
 };
 
