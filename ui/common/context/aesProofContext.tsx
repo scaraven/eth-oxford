@@ -1,6 +1,12 @@
 "use client";
-import React, { createContext, useContext, useEffect, useState } from "react";
-import AesWorkerClient from "../workers/aes/AesWorkerClient";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { MyProgram } from "../../../contracts/build/src/Example/Program";
 
 type AesProofContextType = {
   getEncryptionProof: (message: string, aesKey: string) => Promise<string>;
@@ -16,49 +22,43 @@ export const AesProofProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [zkappWorkerClient, setZkappWorkerClient] =
-    useState<null | AesWorkerClient>(null);
-  const [hasBeenSetup, setHasBeenSetup] = useState(false);
+  const [zkInstance, setZkInstance] = useState<typeof MyProgram>();
 
   useEffect(() => {
     const setup = async () => {
       try {
-        if (!hasBeenSetup) {
-          console.log("Setting up AES worker client...");
-          const aesWorkerClient = new AesWorkerClient();
-          setZkappWorkerClient(zkappWorkerClient);
-
-          console.log("Loading AES contract...");
-          await aesWorkerClient.loadContract();
-
-          console.log("Compiling AES contract...");
-          await aesWorkerClient.compileContract();
-
-          console.log("AES worker client setup complete!");
-          setHasBeenSetup(true);
-          setIsLoading(false);
-        }
-      } catch (error: any) {
-        alert("Error during setup! See console.");
-        console.error(`Error during setup: ${error.message}`);
+        console.log("Compiling contract...");
+        const newInstance = MyProgram;
+        await newInstance.compile();
+        setZkInstance(newInstance);
+        setIsLoading(false);
+      } catch (error) {
+        alert("Failed to compile contract");
+        console.error("Failed to compile contract", error);
       }
     };
     setup();
   }, []);
 
-  const getEncryptionProof = async (
-    message: string,
-    aesKey: string
-  ): Promise<string> => {
-    return await zkappWorkerClient!.encrypt(message, aesKey);
-  };
+  const getEncryptionProof = useCallback(
+    async (message: string, aesKey: string): Promise<string> => {
+      if (!zkInstance) {
+        throw new Error("zkInstance not initialized");
+      }
+      return await zkInstance.baseCase().toString();
+    },
+    [zkInstance]
+  );
 
-  const getDecryptionProof = async (
-    message: string,
-    aesKey: string
-  ): Promise<string> => {
-    return await zkappWorkerClient!.decrypt(message, aesKey);
-  };
+  const getDecryptionProof = useCallback(
+    async (message: string, aesKey: string): Promise<string> => {
+      if (!zkInstance) {
+        throw new Error("zkInstance not initialized");
+      }
+      return await zkInstance.baseCase().toString();
+    },
+    [zkInstance]
+  );
 
   return (
     <AesProofContext.Provider

@@ -1,35 +1,27 @@
 import * as Comlink from "comlink";
 // import type { AES } from "../../../../contracts/src/AES/AES";
-import type { MyProgram } from "../../../../contracts/src/Example/Program";
+import { MyProgram } from "../../../../contracts/build/src/Example/Program.js";
 
 const state = {
-  AESInstance: null as null | typeof MyProgram,
+  AESInstance: MyProgram,
 };
 
 interface Api {
-  loadContract: () => Promise<void>;
-  compileContract: () => Promise<void>;
-  encrypt: (input: string) => Promise<string>;
-  decrypt: (input: string) => Promise<string>;
+  compileContract: () => void;
+  encrypt: (message: string, aesKey: string) => Promise<string>;
+  decrypt: (message: string, aesKey: string) => Promise<string>;
 }
 
 export const api: Api = {
-  async loadContract() {
-    const { MyProgram } = await import(
-      "../../../../contracts/build/src/Example/Program"
-    ); //import("../../../../contracts/build/src/AES/AES.js");
-    state.AESInstance = MyProgram;
-  },
-
   async compileContract() {
-    await state.AESInstance!.compile();
+    await state.AESInstance.compile();
   },
 
-  async encrypt(input: string) {
+  async encrypt(message: string, aesKey: string) {
     return state.AESInstance!.baseCase().toString();
   },
 
-  async decrypt(input: string) {
+  async decrypt(message: string, aesKey: string) {
     return state.AESInstance!.baseCase().toString();
   },
 };
