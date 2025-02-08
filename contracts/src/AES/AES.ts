@@ -15,6 +15,7 @@ class AES extends SmartContract {
 
     @method.returns(Byte16)
     async sbox(input: Byte16): Promise<Byte16> {
+        // Get top 64 bits
         return sbox(input.value);
     }
 }

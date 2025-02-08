@@ -31,7 +31,7 @@ function sbox(input: Field): Byte16 {
         // Take the corresponding byte from 
         // Apply the S-box to each byte of the input
         let shifted = Gadgets.rightShift64(input, i * 8)
-        let byte = Gadgets.and(shifted, Field(0xff), 8);
+        let byte = Gadgets.and(shifted, Field(0xff), 64);
         let byte_output = Field(0);
 
         let iterator = sboxList.startIterating();

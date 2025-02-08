@@ -34,7 +34,7 @@ describe("Bytes", () => {
         expect(() => Byte16.fromBytes(byteArray)).toThrow("Byte value 256 is out of range. Must be between 0 and 255.");
     });
 
-    it("Byte16 internal value instance is correct", () => {
+    it("correctly calculates Byte16 internal value", () => {
         const byteArray = [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 ,0x00, 0x00, 0xde, 0xad];
 
         const byte16Instance = Byte16.fromBytes(byteArray);

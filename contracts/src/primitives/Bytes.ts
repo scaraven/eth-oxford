@@ -48,6 +48,11 @@ export class Byte16 extends Struct({
     return bytes;
   }
 
+  toJSON() {
+    // Convert the underlying Field (and its BigInt) to a string.
+    return { value: this.value.toString() };
+  }
+
   /**
    * Perform XOR operation between two Byte values.
    * @param a First Byte struct.
