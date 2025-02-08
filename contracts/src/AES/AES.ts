@@ -1,15 +1,14 @@
-import { Field, MerkleList, method, SmartContract } from "o1js";
+import { method, Proof, SmartContract } from "o1js";
 import { Byte16 } from "../primitives/Bytes.js";
 import { sbox } from "./SBox.js";
 import { shiftRows } from "./ShiftRows.js"
 import { FieldList } from "../utils/list.js";
 import { gmixColumn } from "./MixColumns.js";
 
-function encrypt(message: Byte16, key: Byte16) {
-    return message;
-}
+class AESProof extends Proof<Byte16, Byte16> {};
 
 class AES extends SmartContract {
+
   @method.returns(Byte16)
   async encrypt(input: Byte16): Promise<Byte16> {
     return input;
@@ -40,4 +39,4 @@ class AES extends SmartContract {
     }
 }
 
-export { AES, encrypt };
+export { AES, AESProof };

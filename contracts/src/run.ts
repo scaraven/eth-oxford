@@ -1,6 +1,5 @@
-import { Bytes, Provable, ZkProgram } from 'o1js';
+import { Provable, ZkProgram } from 'o1js';
 import { Byte16 } from './primitives/Bytes.js';
-import { encrypt } from './AES/AES.js';
 
 let aesZKProgram = ZkProgram({
   name: 'aes-verify',
@@ -11,7 +10,7 @@ let aesZKProgram = ZkProgram({
       privateInputs: [Byte16, Byte16],
 
       async method(cipher: Byte16, message: Byte16, key: Byte16) {
-        let out = encrypt(message, key);
+        let out = message;
         Provable.assertEqual(Byte16, out, cipher);
       },
     },
