@@ -3,7 +3,7 @@ import { gmixColumn } from "./MixColumns";
 import { FieldList } from "../utils/list";
 
 describe("GMixColumns", () => {
-    // Stolen from: https://www.samiam.org/mix-column.html
+    // Examples taken from: https://www.samiam.org/mix-column.html
     it("generates correct key for single column input", async () => {
         const input = FieldList.from([Field(0xdb), Field(0x13), Field(0x53), Field(0x45)]);
 

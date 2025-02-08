@@ -1,7 +1,13 @@
-import { method, SmartContract } from 'o1js';
-import { Byte16 } from '../primitives/Bytes';
-import { sbox } from './SBox';
-import { shiftRows } from './ShiftRows';
+import { Field, MerkleList, method, SmartContract } from "o1js";
+import { Byte16 } from "../primitives/Bytes";
+import { sbox } from "./SBox";
+import { shiftRows } from "./ShiftRows"
+import { FieldList } from "../utils/list";
+import { gmixColumn } from "./MixColumns";
+
+function encrypt(message: Byte16, key: Byte16) {
+    return message;
+}
 
 class AES extends SmartContract {
   @method.returns(Byte16)
@@ -23,15 +29,18 @@ class AES extends SmartContract {
     return new Byte16(enc_top, enc_bot);
   }
 
-  @method.returns(Byte16)
-  async mixColumns(input: Byte16): Promise<Byte16> {
-    return input;
-  }
-
-  @method.returns(Byte16)
-  async shiftRows(input: Byte16): Promise<Byte16> {
-    return shiftRows(input);
-  }
+    @method.returns(FieldList)
+    async mixColumns(input: Byte16): Promise<FieldList> {
+        let list = FieldList.empty();
+        list.push(input.top);
+        list.push(input.bot);
+        return gmixColumn(list);
+    }
+    
+    @method.returns(Byte16)
+    async shiftRows(input: Byte16): Promise<Byte16> {
+        return shiftRows(input);
+    }
 }
 
-export { AES };
+export { AES, encrypt };
