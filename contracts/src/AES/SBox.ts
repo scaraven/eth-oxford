@@ -24,8 +24,7 @@ function sbox(input: Field): Field {
     ];
 
     const sboxList = SBoxList.from(sbox);
-
-    // TODO: Only 64 bits right now
+    
     for (let i = 0; i < 8; i++) {
         // Take the corresponding byte from 
         // Apply the S-box to each byte of the input
