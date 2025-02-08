@@ -63,6 +63,40 @@ export class Byte16 extends Struct({
     return bytes;
   }
 
+  toColumns(): Field[][] {
+    // Get first column
+    let arr: Field[][] = [];
+    for (let i = 0; i < 4; i++) {
+      let first = Gadgets.and(Gadgets.rightShift64(this.top, (7 - i) * 8), Field(0xff), 64);
+      let second = Gadgets.and(Gadgets.rightShift64(this.top, (3 - i) * 8), Field(0xff), 64);
+      let third = Gadgets.and(Gadgets.rightShift64(this.bot, (7 - i) * 8), Field(0xff), 64);
+      let fourth = Gadgets.and(Gadgets.rightShift64(this.bot, (3 - i) * 8), Field(0xff), 64);
+
+      arr.push([first, second, third, fourth]);
+    }
+
+    return arr;
+  }
+
+  static fromColumns(cols: Field[][]): Byte16 {
+    // Build top first
+    let top = Field(0);
+    let bot = Field(0);
+    for (let i = 0; i < 2; i++) {
+      for (let j = 0; j < 4; j++) {
+        top = Gadgets.or(Gadgets.leftShift64(top, 8), cols[i][j], 64);
+      }
+    }
+
+    for (let i = 2; i < 4; i++) {
+      for (let j = 0; j < 4; j++) {
+        bot = Gadgets.or(Gadgets.leftShift64(bot, 8), cols[i][j], 64);
+      }
+    }
+
+    return new Byte16(top, bot);
+  }
+
   toField(): Field {
     return this.bot.add(this.top.mul(Byte16.TWO64));
   }

@@ -2,6 +2,7 @@ import { Field } from "o1js";
 import { gmixColumn } from "./MixColumns";
 
 describe("GMixColumns", () => {
+    // Stolen from: https://www.samiam.org/mix-column.html
     it("generates correct key for single column input", async () => {
         const input = [Field(0xdb), Field(0x13), Field(0x53), Field(0x45)];
 

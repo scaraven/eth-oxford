@@ -41,4 +41,14 @@ describe("Bytes", () => {
         expect(byte16Instance.toField()).toEqual(Field(0xdead));
         expect(byte16Instance.toField()).toEqual(Field(57005));
     });
+
+    it("arranges bytes into 4 columns", () => {
+        const byteArray = [0x01, 0xAB, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xFF];
+
+        const columns = Byte16.fromBytes(byteArray).toColumns();
+        expect(columns[0]).toEqual([Field(0x01), Field(0x78), Field(0xF0), Field(0x78)]);
+        expect(columns[1]).toEqual([Field(0xAB), Field(0x9A), Field(0x12), Field(0x9A)]);
+        expect(columns[2]).toEqual([Field(0x34), Field(0xBC), Field(0x34), Field(0xBC)]);
+        expect(columns[3]).toEqual([Field(0x56), Field(0xDE), Field(0x56), Field(0xFF)]);
+    });
 });

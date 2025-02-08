@@ -1,6 +1,5 @@
-import { Field, Gadgets, MerkleList } from "o1js";
-
-class SBoxList extends MerkleList.create(Field) {}
+import { Field, Gadgets } from "o1js";
+import { FieldList } from "../utils/list";
 
 function sbox(input: Field): Field {
     let output: Field = Field(0);
@@ -23,8 +22,8 @@ function sbox(input: Field): Field {
         Field(0x8C), Field(0xA1), Field(0x89), Field(0x0D), Field(0xBF), Field(0xE6), Field(0x42), Field(0x68), Field(0x41), Field(0x99), Field(0x2D), Field(0x0F), Field(0xB0), Field(0x54), Field(0xBB), Field(0x16)
     ];
 
-    const sboxList = SBoxList.from(sbox);
-    
+    const sboxList = FieldList.from(sbox);
+
     for (let i = 0; i < 8; i++) {
         // Take the corresponding byte from 
         // Apply the S-box to each byte of the input
