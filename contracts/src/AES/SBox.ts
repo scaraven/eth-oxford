@@ -1,4 +1,5 @@
 import { Field, Gadgets, Provable, Struct } from "o1js";
+import { Byte16 } from "../primitives/Bytes";
 
 class SBoxArr extends Struct({
     value: Provable.Array(Field, 256)
@@ -49,5 +50,12 @@ function sbox(input: Field): Field {
     return output;
 }
 
+function sbox_public(input: Byte16): Byte16 {
+    const enc_top = sbox(input.top);
+    const enc_bot = sbox(input.bot);
 
-export { sbox };
+    return new Byte16(enc_top, enc_bot);
+}
+
+
+export { sbox_public as sbox };

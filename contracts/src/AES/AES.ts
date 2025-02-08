@@ -22,13 +22,10 @@ class AES extends SmartContract {
 
   @method.returns(Byte16)
   async sbox(input: Byte16): Promise<Byte16> {
-    // Get top 64 bits
-    const enc_top = sbox(input.top);
-    const enc_bot = sbox(input.bot);
-
-    return new Byte16(enc_top, enc_bot);
+    return sbox(input);
   }
 
+    // TODO: Not correct
     @method.returns(FieldList)
     async mixColumns(input: Byte16): Promise<FieldList> {
         let list = FieldList.empty();
