@@ -21,9 +21,15 @@ describe("Bytes", () => {
         expect(() => Byte16.fromBytes(byteArray)).toThrow("Expected 16 bytes, but got 15.");
     });
 
-    it("Throws error when byte value is out of range", () => {
+    it("Throws error when byte array is too large", () => {
         const byteArray = [0x01, 0xAB, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xFF, 0xFF];
 
         expect(() => Byte16.fromBytes(byteArray)).toThrow("Expected 16 bytes, but got 17.");
+    });
+
+    it("Throws error when byte value is out of range", () => {
+        const byteArray = [0x01, 0xAB, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0x100];
+
+        expect(() => Byte16.fromBytes(byteArray)).toThrow("Byte value 256 is out of range. Must be between 0 and 255.");
     });
 });
