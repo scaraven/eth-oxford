@@ -1,4 +1,4 @@
-import { Field, Gadgets, MerkleList, MerkleListIterator, Provable } from "o1js";
+import { Field, Gadgets, MerkleList } from "o1js";
 
 class SBoxList extends MerkleList.create(Field) {}
 
