@@ -10,8 +10,8 @@ import {
 import { Byte16 } from '../primitives/Bytes';
 import { FieldList } from '../utils/list';
 
-function MixColumn(input: Byte16): Field {
-  return input.top;
+function MixColumn(input: Byte16): Byte16 {
+  return input;
 }
 
 function xor8(a: Field, b: Field): Field {
