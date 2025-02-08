@@ -14,7 +14,7 @@
  */
 import fs from 'fs/promises';
 import { Mina, NetworkId, PrivateKey } from 'o1js';
-import { Add } from './Add.js';
+import { Add } from './Add/Add.js';
 
 // check command line arg
 const deployAlias = process.argv[2];

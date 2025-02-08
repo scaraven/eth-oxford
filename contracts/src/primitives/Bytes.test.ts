@@ -1,3 +1,4 @@
+import { Field } from 'o1js';
 import { Byte16 } from './Bytes';
 
 describe("Bytes", () => {
@@ -31,5 +32,13 @@ describe("Bytes", () => {
         const byteArray = [0x01, 0xAB, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0x100];
 
         expect(() => Byte16.fromBytes(byteArray)).toThrow("Byte value 256 is out of range. Must be between 0 and 255.");
+    });
+
+    it("Byte16 internal value instance is correct", () => {
+        const byteArray = [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 ,0x00, 0x00, 0xde, 0xad];
+
+        const byte16Instance = Byte16.fromBytes(byteArray);
+        expect(byte16Instance.value).toEqual(Field(0xdead));
+        expect(byte16Instance.value).toEqual(Field(57005));
     });
 });
