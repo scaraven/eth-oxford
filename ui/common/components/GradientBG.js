@@ -1,6 +1,6 @@
 // @ts-nocheck
-import styles from '../styles/Home.module.css';
-import { useEffect, useState, useRef } from 'react';
+import styles from "../../styles/Home.module.css";
+import { useEffect, useState, useRef } from "react";
 
 export default function GradientBG({ children }) {
   const canvasRef = useRef(null);
@@ -17,7 +17,7 @@ export default function GradientBG({ children }) {
 
     this.toString = function () {
       return (
-        'hsla(' + this.h + ', ' + this.s + '%, ' + this.l + '%, ' + this.a + ')'
+        "hsla(" + this.h + ", " + this.s + "%, " + this.l + "%, " + this.a + ")"
       );
     };
   }
@@ -112,7 +112,7 @@ export default function GradientBG({ children }) {
   useEffect(() => {
     if (canvasRef.current) {
       const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
       setContext(ctx);
 
       const currentPixels = [
