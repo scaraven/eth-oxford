@@ -9,10 +9,6 @@ export default class AesWorkerClient {
       type: "module",
     });
     this.remoteApi = Comlink.wrap(worker);
-  } 
-
-  async loadContract() {
-    return this.remoteApi.loadContract();
   }
 
   async compileContract() {
