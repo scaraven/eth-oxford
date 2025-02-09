@@ -21,7 +21,7 @@ const AesProofGenerator: React.FC<Props> = ({
 
   const verifyProof = () => {
     // Run proof verification passing the proof to the virefier contract
-  };
+  };``
 
   if (false && isLoading) {
     return (

@@ -18,12 +18,4 @@ export default class AesWorkerClient {
   async compileContract() {
     return this.remoteApi.compileContract();
   }
-
-  async encrypt(message: string, aesKey: string) {
-    return this.remoteApi.encrypt(message, aesKey);
-  }
-
-  async decrypt(message: string, aesKey: string) {
-    return this.remoteApi.decrypt(message, aesKey);
-  }
 }

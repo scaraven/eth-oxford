@@ -49,21 +49,14 @@ export const AesProofProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const getEncryptionProof = useCallback(
     async (message: string, aesKey: string): Promise<string> => {
-      if (!aesWorkerClient) {
-        throw new Error("aesWorkerClient not initialized");
-      }
-
-      return await aesWorkerClient.encrypt(message, aesKey).toString();
+      return "To implement";
     },
     [aesWorkerClient]
   );
 
   const getDecryptionProof = useCallback(
     async (message: string, aesKey: string): Promise<string> => {
-      if (!aesWorkerClient) {
-        throw new Error("aesWorkerClient not initialized");
-      }
-      return await aesWorkerClient.decrypt(message, aesKey).toString();
+      return "To implement";
     },
     [aesWorkerClient]
   );
