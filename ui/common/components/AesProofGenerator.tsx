@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useAesProof } from "../context/aesProofContext";
 
 type Props = {
   message: string;
@@ -14,14 +15,16 @@ const AesProofGenerator: React.FC<Props> = ({
   isLoading,
 }) => {
   const [proof, setProof] = useState<string | undefined>(undefined);
+  const { aesWorkerClient } = useAesProof();
 
   const generateProof = () => {
     setProof("proof");
   };
 
-  const verifyProof = () => {
-    // Run proof verification passing the proof to the virefier contract
-  };``
+  const verifyProof = async () => {
+    // TODO
+  };
+  ``;
 
   if (false && isLoading) {
     return (
