@@ -32,10 +32,10 @@ export const AesProofProvider: React.FC<{ children: React.ReactNode }> = ({
         const client = new AesWorkerClient();
         setAesWorkerClient(client);
 
-        await client.loadContract();
+        await client.loadContracts();
 
         console.log("Compiling the contract...");
-        await client.compileContract();
+        await client.compileAseContract();
 
         console.log("Worker and contract are ready!");
         setIsLoading(false);
