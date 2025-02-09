@@ -7,8 +7,7 @@ import {
 import { Byte16 } from '../primitives/Bytes.js';
 import { FieldList } from '../utils/list.js';
 
-export function mixColumn(input: Byte16): Byte16 {
-
+function mixColumn(input: Byte16): Byte16 {
     let top = Field(0)
     let bot = Field(0)
 
@@ -30,12 +29,38 @@ export function mixColumn(input: Byte16): Byte16 {
     return new Byte16(top, bot);
 }
 
+function mixColumnInv(input: Byte16): Byte16 {
+    let top = Field(0)
+    let bot = Field(0)
+
+    for (let j = 0; j < 4; ++j) {
+        let col = FieldList.empty();
+        for (let i = 3; i >= 0; --i) {
+            let inp = Provable.if(new Bool (i < 2), input.bot, input.top);
+            let shift = 24 + (i%2)*32 - j*8;
+            let mask = Gadgets.leftShift64(Field(0xff), shift);
+            col.push(Gadgets.rightShift64(Gadgets.and(mask, inp, 64), shift));
+        }
+        let mixCol: FieldList = gmixColumnInv(col);
+        // just do the loop for the output manually by popping off of mixCol
+        bot = Gadgets.or(Gadgets.leftShift64(mixCol.pop(),      24 - 8*j), bot, 64);
+        bot = Gadgets.or(Gadgets.leftShift64(mixCol.pop(), 32 + 24 - 8*j), bot, 64);
+        top = Gadgets.or(Gadgets.leftShift64(mixCol.pop(),      24 - 8*j), top, 64);
+        top = Gadgets.or(Gadgets.leftShift64(mixCol.pop(), 32 + 24 - 8*j), top, 64);
+    }
+    return new Byte16(top, bot);
+}
+
 function xor8(a: Field, b: Field): Field {
   return Gadgets.xor(a, b, 8);
 }
 
 function xor8_5(a: Field, b: Field, c: Field, d: Field, e: Field): Field {
   return xor8(xor8(xor8(xor8(a, b), c), d), e);
+}
+
+function xor8_4(a: Field, b: Field, c: Field, d: Field): Field {
+  return xor8(xor8(xor8(a, b), c), d);
 }
 
 export function gmixColumn(r: FieldList): FieldList {
@@ -82,4 +107,10 @@ export function gmixColumn(r: FieldList): FieldList {
   const r3 = xor8_5(b_3, a_2, a_1, b_0, a_0);
 
   return FieldList.from([r0, r1, r2, r3]);
+}
+
+export function gmixColumnInv(r: FieldList): FieldList {
+  // apparently the matmul^4 times is Identity, so we just take it 3 times for inverse
+  return gmixColumn(gmixColumn(gmixColumn(r)))
+  // const ieldList.from([r0, r1, r2, r3]);
 }
