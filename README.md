@@ -49,3 +49,6 @@ The project is structured into two primary components:
     npm run dev
     ```
 3. Visit `http://localhost:3000/aes_demo` and generate a proof!
+
+## Youtube Demo
+- https://www.youtube.com/watch?v=bwRIXFiTDRQ
