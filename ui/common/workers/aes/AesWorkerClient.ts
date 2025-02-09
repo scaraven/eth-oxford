@@ -1,4 +1,6 @@
 import * as Comlink from "comlink";
+import { Proof } from "o1js";
+import { AESPublicInput } from "../../../../contracts/build/src/AES/AES";
 
 export default class AesWorkerClient {
   worker: Worker;
@@ -19,12 +21,15 @@ export default class AesWorkerClient {
     return this.remoteApi.compileAseContract();
   }
 
-  async getAesProof(message: string, aesKey: string) {
-    return this.remoteApi.getAesProof(message, aesKey);
+  async getAesProof(message: string, ciphertext: string, aesKey: string) {
+    return this.remoteApi.getAesProof(message, ciphertext, aesKey);
   }
 
-  async verifyAesProof(proof: string, message: string, aesKey: string) {
-    return this.remoteApi.verifyAesProof(proof, message, aesKey);
+  async verifyAesProof(proof: {
+    proof: Proof<AESPublicInput, void>;
+    auxiliaryOutput: undefined;
+  }) {
+    return this.remoteApi.verifyAesProof(proof);
   }
 
   async setActiveInstanceToDevnet() {
@@ -35,7 +40,7 @@ export default class AesWorkerClient {
     return this.remoteApi.compileVerifierContract();
   }
 
-  async verifierInitAndFetch() {
-    return this.remoteApi.verifierInitAndFetch();
+  async verifierInitAndFetch(publicKey58: string) {
+    return this.remoteApi.verifierInitAndFetch(publicKey58);
   }
 }

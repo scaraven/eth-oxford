@@ -93,9 +93,7 @@ const MessageProcessor: React.FC<Props> = ({ processType }) => {
       {processedMessage && !isProcessing && (
         <div className="w-full flex items-center justify-center flex-wrap gap-4">
           <div className="mt-4 p-2 bg-white rounded-lg shadow-md text-center">
-            <h2 className="text-lg font-semibold">
-              Processed Messagsasdsade:{" "}
-            </h2>
+            <h2 className="text-lg font-semibold">Processed Message: </h2>
             <p className="text-gray-700 break-all">{processedMessage}</p>
           </div>
         </div>

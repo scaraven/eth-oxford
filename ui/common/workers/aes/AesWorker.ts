@@ -1,7 +1,9 @@
 import * as Comlink from "comlink";
 import type { aesZKProgram as AESType } from "../../../../contracts/src/run";
-import { Mina, PublicKey, fetchAccount } from "o1js";
+import { Mina, Proof, PublicKey, fetchAccount } from "o1js";
 import { minaNetworkConfig } from "../../../minaNetwork.config";
+import { stringToByte16, stringToByte16Array } from "../../utils/bytes";
+import { AESPublicInput } from "../../../../contracts/build/src/AES/AES";
 
 const state = {
   AESInstance: null as null | typeof AESType,
@@ -15,13 +17,19 @@ interface Api {
 
   setActiveInstanceToDevnet: () => Promise<void>;
   compileVerifierContract: () => Promise<void>;
-  verifierInitAndFetch: () => Promise<void>;
-  getAesProof: (message: string, aesKey: string) => Promise<void>;
-  verifyAesProof: (
-    proof: string,
+  verifierInitAndFetch: (publicKey58: string) => Promise<void>;
+  getAesProof: (
     message: string,
+    ciphertext: string,
     aesKey: string
-  ) => Promise<string>;
+  ) => Promise<{
+    proof: Proof<AESPublicInput, void>;
+    auxiliaryOutput: undefined;
+  }>;
+  verifyAesProof: (proof: {
+    proof: Proof<AESPublicInput, void>;
+    auxiliaryOutput: undefined;
+  }) => Promise<string>;
 }
 
 export const api: Api = {
@@ -50,7 +58,22 @@ export const api: Api = {
     });
   },
 
-  async getAesProof(message: string, aesKey: string) {},
+  async getAesProof(message: string, ciphertext: string, aesKey: string) {
+    if (!state.AESInstance) {
+      throw new Error("Contract not loaded");
+    }
+
+    console.log("Generating proof...");
+    const proof = await state.AESInstance.verifyAES128(
+      {
+        cipher: stringToByte16(ciphertext),
+      },
+      stringToByte16(message),
+      stringToByte16Array(aesKey)
+    );
+
+    return proof;
+  },
 
   // Functions below are mostely used for verifier contract
   async setActiveInstanceToDevnet() {
@@ -70,20 +93,28 @@ export const api: Api = {
     });
   },
 
-  async verifierInitAndFetch() {
-    const publicKey58 = minaNetworkConfig.aesVerifierContractAddress;
+  async verifierInitAndFetch(publicKey58: string) {
+    console.log("Initializing verifier contract...");
     const publicKey = PublicKey.fromBase58(publicKey58);
 
     const accountRes = await fetchAccount({ publicKey });
     if (accountRes.error !== null) {
-      alert("Failed to fetch account");
+      console.log("Failed to fetch account :(");
       throw new Error("Failed to fetch account");
     }
 
-    state.zkVerifierAppInstance = new state.AESVerifierInstance!(publicKey);
+    const contractAddress = PublicKey.fromBase58(
+      minaNetworkConfig.aesVerifierContractAddress
+    );
+    state.zkVerifierAppInstance = new state.AESVerifierInstance!(
+      contractAddress
+    );
   },
 
-  async verifyAesProof(proof: string) {
+  async verifyAesProof(proof: {
+    proof: Proof<AESPublicInput, void>;
+    auxiliaryOutput: undefined;
+  }) {
     const transaction = await Mina.transaction(async () => {
       await state.zkVerifierAppInstance.verify({ proof });
     });
