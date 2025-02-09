@@ -26,16 +26,48 @@ export function encrypt(message: Byte16, key: Byte16[]): Byte16 {
   return state;
 }
 
+function encryptStageOne(message: Byte16, key: Byte16[]): Byte16 {
+  let state = message;
+
+  state = addRoundKey(state, key[0]);
+
+  for (let i = 1; i < NUM_ROUNDS - 1; i++) {
+    state = sbox(state);
+    state = shiftRows(state);
+    state = mixColumn(state);
+    state = addRoundKey(state, key[i]);
+  }
+
+  return state;
+}
+
+function encryptStageTwo(message: Byte16, key: Byte16[]): Byte16 {
+  let state = message;
+
+  for (let i = NUM_ROUNDS - 1; i < NUM_ROUNDS; i++) {
+    state = sbox(state);
+    state = shiftRows(state);
+    state = mixColumn(state);
+    state = addRoundKey(state, key[i]);
+  }
+
+  state = sbox(state);
+  state = shiftRows(state);
+  state = addRoundKey(state, key[NUM_ROUNDS]);
+
+  return state;
+}
+
 let aesZKProgram = ZkProgram({
   name: 'aes-verify',
   publicInput: AESPublicInput,
 
   methods: {
-    verifyAES128: {
+    verifyAES128Partial: {
       privateInputs: [Byte16, Provable.Array(Byte16, NUM_ROUNDS + 1)],
 
       async method(input: AESPublicInput, message: Byte16, roundKeys: Byte16[]) {
-        let state = encrypt(message, roundKeys);
+        let state = encryptStageTwo(message, roundKeys);
 
         return state.assertEquals(input.cipher);
       },
@@ -43,9 +75,9 @@ let aesZKProgram = ZkProgram({
   },
 });
 
-let { verifyAES128 } = await aesZKProgram.analyzeMethods();
+let { verifyAES128Partial } = await aesZKProgram.analyzeMethods();
 
-console.log(verifyAES128.summary());
+console.log(verifyAES128Partial.summary());
 
 console.time('compile');
 const forceRecompileEnabled = false;
@@ -70,15 +102,23 @@ const key = [
   Byte16.fromBytes([0x72, 0x07, 0x38, 0xe5, 0x4c, 0xcf, 0x3b, 0x26, 0x48, 0x38, 0x4a, 0xf2, 0x8b, 0xa3, 0x02, 0x4e])
 ]
 
-const cipher = Byte16.fromBytes([
+const cipher = encrypt(message, key);
+
+/*const cipher = Byte16.fromBytes([
   0x9e, 0xd6, 0xb3, 0x12, 0x27, 0x48, 0xa0, 0x79, 0x98, 0xdf, 0x67, 0xf0, 0x41,
   0x32, 0x82, 0xb1,
-]);
+]);*/
 console.timeEnd('generate inputs');
 
+console.time('out of circuit proof');
+let partial_output = encryptStageOne(message, key);
+console.timeEnd('out of circuit proof');
+
 console.time('prove');
-let { proof } = await aesZKProgram.verifyAES128(new AESPublicInput({ cipher }), message, key);
+let { proof } = await aesZKProgram.verifyAES128Partial(new AESPublicInput({ cipher }), partial_output, key);
 console.timeEnd('prove');
+
+console.log("Mina Proof: ", proof);
 
 console.time('verify');
 await aesZKProgram.verify(proof);
