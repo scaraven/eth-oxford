@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAesProof } from "../context/aesProofContext";
-import { Proof } from "o1js";
+import { Proof, SelfProof } from "o1js";
 import { AESPublicInput } from "../../../contracts/build/src/AES/AES";
 
 type Props = {
@@ -16,23 +16,28 @@ const AesProofGenerator: React.FC<Props> = ({
   ciphertext,
   isLoading,
 }) => {
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [proof, setProof] = useState<
-    | { proof: Proof<AESPublicInput, void>; auxiliaryOutput: undefined }
+    | { proof: SelfProof<AESPublicInput, void>; auxiliaryOutput: undefined }
     | undefined
   >(undefined);
   const { aesWorkerClient } = useAesProof();
 
   const generateProof = async () => {
+    setIsProcessing(true);
     const proof = await aesWorkerClient?.getAesProof(
       message,
       ciphertext,
       aesKey
     );
     setProof(proof);
+    setIsProcessing(false);
   };
 
   const verifyProof = async () => {
-    return aesWorkerClient?.verifyAesProof(proof!);
+    setIsProcessing(true);
+    const ret =  await aesWorkerClient?.verifyAesProof(proof!);
+    setIsProcessing(false);
   };
 
   if (isLoading) {
@@ -61,7 +66,7 @@ const AesProofGenerator: React.FC<Props> = ({
             <div className="mt-4 p-2 bg-white rounded-lg shadow-md text-center">
               <h2 className="text-lg font-semibold">Proof: </h2>
               <p className="text-gray-700 break-all">
-                {proof.proof.toJSON().toString()}
+                Proof is ready: See Console!
               </p>
             </div>
           </div>
@@ -73,6 +78,13 @@ const AesProofGenerator: React.FC<Props> = ({
           </button>
         </>
       )}
+
+      {
+        isProcessing && 
+          <div className="flex items-center justify-center rounded-lg">
+            <div className="animate-spin h-10 w-10 border-4 border-red-600 border-t-transparent rounded-full" />
+          </div>
+      }
     </>
   );
 };

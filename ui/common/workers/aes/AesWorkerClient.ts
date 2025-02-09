@@ -1,6 +1,6 @@
 import * as Comlink from "comlink";
-import { Proof } from "o1js";
-import { AESPublicInput } from "../../../../contracts/build/src/AES/AES";
+import { Proof, SelfProof } from "o1js";
+import { AESProof, AESPublicInput } from "../../../../contracts/build/src/AES/AES";
 
 export default class AesWorkerClient {
   worker: Worker;
@@ -26,7 +26,7 @@ export default class AesWorkerClient {
   }
 
   async verifyAesProof(proof: {
-    proof: Proof<AESPublicInput, void>;
+    proof: SelfProof<AESPublicInput, void>;
     auxiliaryOutput: undefined;
   }) {
     return this.remoteApi.verifyAesProof(proof);

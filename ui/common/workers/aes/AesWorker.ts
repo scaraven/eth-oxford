@@ -1,9 +1,9 @@
 import * as Comlink from "comlink";
-import type { aesZKProgram as AESType } from "../../../../contracts/src/run";
-import { Mina, Proof, PublicKey, fetchAccount } from "o1js";
+import { aesZKProgram, encrypt, encryptStageOne, type aesZKProgram as AESType } from "../../../../contracts/build/src/run";
+import { Mina, Proof, PublicKey, SelfProof, fetchAccount } from "o1js";
 import { minaNetworkConfig } from "../../../minaNetwork.config";
 import { stringToByte16, stringToByte16Array } from "../../utils/bytes";
-import { AESPublicInput } from "../../../../contracts/build/src/AES/AES";
+import { AESProof, AESPublicInput } from "../../../../contracts/build/src/AES/AES";
 
 const state = {
   AESInstance: null as null | typeof AESType,
@@ -23,11 +23,11 @@ interface Api {
     ciphertext: string,
     aesKey: string
   ) => Promise<{
-    proof: Proof<AESPublicInput, void>;
+    proof: SelfProof<AESPublicInput, void>;
     auxiliaryOutput: undefined;
   }>;
   verifyAesProof: (proof: {
-    proof: Proof<AESPublicInput, void>;
+    proof: SelfProof<AESPublicInput, void>;
     auxiliaryOutput: undefined;
   }) => Promise<string>;
 }
@@ -64,13 +64,16 @@ export const api: Api = {
     }
 
     console.log("Generating proof...");
-    const proof = await state.AESInstance.verifyAES128(
+    const partial_output = encryptStageOne(stringToByte16(message), stringToByte16Array(aesKey));
+    const proof = await state.AESInstance.verifyAES128Partial(
       {
         cipher: stringToByte16(ciphertext),
       },
-      stringToByte16(message),
+      partial_output,
       stringToByte16Array(aesKey)
     );
+
+    console.log("Mina Proof: ", proof.proof);
 
     return proof;
   },
@@ -95,9 +98,10 @@ export const api: Api = {
 
   async verifierInitAndFetch(publicKey58: string) {
     console.log("Initializing verifier contract...");
-    const publicKey = PublicKey.fromBase58(publicKey58);
+    // const publicKey = PublicKey.fromBase58(publicKey58);
 
-    const accountRes = await fetchAccount({ publicKey });
+    const accountRes = await fetchAccount({ publicKey: publicKey58 });
+    console.log(accountRes)
     if (accountRes.error !== null) {
       console.log("Failed to fetch account :(");
       throw new Error("Failed to fetch account");
@@ -112,15 +116,11 @@ export const api: Api = {
   },
 
   async verifyAesProof(proof: {
-    proof: Proof<AESPublicInput, void>;
+    proof: SelfProof<AESPublicInput, void>;
     auxiliaryOutput: undefined;
-  }) {
-    const transaction = await Mina.transaction(async () => {
-      await state.zkVerifierAppInstance.verify({ proof });
-    });
-
-    await transaction.prove();
-    return transaction.toJSON();
+  }): Promise<string> {
+    await aesZKProgram.verify(proof.proof);
+    return "Proof verified successfully";
   },
 };
 

@@ -33,18 +33,18 @@ export const AesProofProvider: React.FC<{ children: React.ReactNode }> = ({
         await client.setActiveInstanceToDevnet();
         await client.loadContracts();
 
-        console.log("Looking for Mina...");
-        const mina = (window as any).mina;
-        if (mina == null) {
-          alert("Mina not found");
-          return;
-        }
-        const publicKeyBase58: string = (await mina.requestAccounts())[0];
-        console.log("Mina found! Public key:", publicKeyBase58);
+        // console.log("Looking for Mina...");
+        // const mina = (window as any).mina;
+        // if (mina == null) {
+        //   alert("Mina not found");
+        //   return;
+        // }
+        // const publicKeyBase58: string = (await mina.requestAccounts())[0];
+        // console.log("Mina found! Public key:", publicKeyBase58);
 
-        // await client.compileAseContract();
-        await client.compileVerifierContract();
-        await client.verifierInitAndFetch(publicKeyBase58);
+        await client.compileAseContract();
+        // await client.compileVerifierContract();
+        // await client.verifierInitAndFetch(publicKeyBase58);
 
         console.log("Worker and contract are ready!");
         setIsLoading(false);

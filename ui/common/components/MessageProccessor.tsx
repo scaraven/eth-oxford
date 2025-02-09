@@ -103,6 +103,7 @@ const MessageProcessor: React.FC<Props> = ({ processType }) => {
         ciphertext={processedMessage}
         aesKey={aesKey}
         isLoading={isLoading || isProcessing}
+
       />
     </div>
   );
