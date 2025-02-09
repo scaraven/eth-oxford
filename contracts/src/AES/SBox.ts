@@ -1,5 +1,5 @@
 import { Field, Gadgets, Provable, Struct } from "o1js";
-import { Byte16 } from "../primitives/Bytes";
+import { Byte16 } from "../primitives/Bytes.js";
 
 class SBoxArr extends Struct({
     value: Provable.Array(Field, 256)

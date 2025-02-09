@@ -1,14 +1,17 @@
+import React from "react";
+
 type KeyGenProps = {
   aesKey: string;
   setAesKey: (key: string) => void;
 };
 
 export const generateRandomKey = () => {
-  const key = new Uint8Array(16);
-  crypto.getRandomValues(key);
-  return Array.from(key)
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
+  // 16 random characters
+  const characters = Array.from({ length: 16 }, () =>
+    Math.floor(Math.random() * 256)
+  );
+
+  return characters.map((char) => String.fromCharCode(char)).join("");
 };
 
 const KeyGen: React.FC<KeyGenProps> = ({ aesKey, setAesKey }) => {
@@ -22,7 +25,7 @@ const KeyGen: React.FC<KeyGenProps> = ({ aesKey, setAesKey }) => {
       <input
         type="text"
         value={aesKey}
-        maxLength={32}
+        maxLength={16}
         onChange={(event) => setAesKey(event.target.value)}
         className="border p-2 rounded w-80"
       />

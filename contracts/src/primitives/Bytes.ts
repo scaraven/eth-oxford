@@ -17,6 +17,11 @@ export class Byte16 extends Struct({
     bot.assertLessThan(Byte16.TWO64);
   }
 
+  assertEquals(other: Byte16) {
+    this.top.assertEquals(other.top);
+    this.bot.assertEquals(other.bot);
+  }
+
   /**
    * Converts an array of 16 bytes into a Byte16 instance.
    * @param bytes An array of 16 numbers, each between 0 and 255.

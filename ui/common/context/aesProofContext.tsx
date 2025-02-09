@@ -9,8 +9,7 @@ import React, {
 import AesWorkerClient from "../workers/aes/AesWorkerClient";
 
 type AesProofContextType = {
-  getEncryptionProof: (message: string, aesKey: string) => Promise<string>;
-  getDecryptionProof: (message: string, aesKey: string) => Promise<string>;
+  aesWorkerClient: AesWorkerClient | undefined;
   isLoading: boolean;
 };
 
@@ -29,50 +28,35 @@ export const AesProofProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const setup = async () => {
       try {
-        console.log("Loading the worker...");
         const client = new AesWorkerClient();
         setAesWorkerClient(client);
+        await client.setActiveInstanceToDevnet();
+        await client.loadContracts();
 
-        console.log("Loading the contract...");
-        await client.loadContract();
+        // console.log("Looking for Mina...");
+        // const mina = (window as any).mina;
+        // if (mina == null) {
+        //   alert("Mina not found");
+        //   return;
+        // }
+        // const publicKeyBase58: string = (await mina.requestAccounts())[0];
+        // console.log("Mina found! Public key:", publicKeyBase58);
 
-        console.log("Compiling the contract...");
-        await client.compileContract();
+        await client.compileAseContract();
+        // await client.compileVerifierContract();
+        // await client.verifierInitAndFetch(publicKeyBase58);
 
         console.log("Worker and contract are ready!");
         setIsLoading(false);
       } catch (error) {
-        alert("Failed to compile contract");
-        console.error("Failed to compile contract", error);
+        console.error("Cometext / worker failure", error);
       }
     };
     setup();
   }, []);
 
-  const getEncryptionProof = useCallback(
-    async (message: string, aesKey: string): Promise<string> => {
-      if (!aesWorkerClient) {
-        throw new Error("aesWorkerClient not initialized");
-      }
-      return await aesWorkerClient.encrypt(message, aesKey).toString();
-    },
-    [aesWorkerClient]
-  );
-
-  const getDecryptionProof = useCallback(
-    async (message: string, aesKey: string): Promise<string> => {
-      if (!aesWorkerClient) {
-        throw new Error("aesWorkerClient not initialized");
-      }
-      return await aesWorkerClient.decrypt(message, aesKey).toString();
-    },
-    [aesWorkerClient]
-  );
-
   return (
-    <AesProofContext.Provider
-      value={{ getEncryptionProof, getDecryptionProof, isLoading }}
-    >
+    <AesProofContext.Provider value={{ aesWorkerClient, isLoading }}>
       {children}
     </AesProofContext.Provider>
   );

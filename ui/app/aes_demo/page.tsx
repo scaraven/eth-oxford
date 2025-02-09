@@ -4,17 +4,10 @@ import { AesProofProvider } from "../../common/context/aesProofContext";
 const AESDemoPage = () => {
   return (
     <AesProofProvider>
-      <MessageProcessor
-        title="AES Encryption"
-        buttonText="Encrypt"
-        processType="encrypt"
-      />
-      <MessageProcessor
-        title="AES Decryption"
-        buttonText="Decrypt"
+      <MessageProcessor processType="encrypt" />
+      {/* <MessageProcessor
         processType="decrypt"
-        bgClass="bg-teal-100"
-      />
+      /> */}
     </AesProofProvider>
   );
 };
