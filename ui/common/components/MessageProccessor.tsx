@@ -19,12 +19,14 @@ const MessageProcessor: React.FC<Props> = ({
   bgClass = "bg-blue-200",
 }) => {
   const [message, setMessage] = useState<string>("");
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [dimension, setDimension] = useState<GridDimension>(4);
   const [processedMessage, setProcessedMessage] = useState<string>("");
   const [aesKey, setAesKey] = useState<string>(generateRandomKey());
   const { getEncryptionProof, getDecryptionProof, isLoading } = useAesProof();
 
   const handleProcess = async () => {
+    setIsProcessing(true);
     if (message.length !== dimension ** 2) {
       alert("Message length must match the grid dimension squared");
       return;
@@ -41,6 +43,7 @@ const MessageProcessor: React.FC<Props> = ({
     console.log("Processing message...");
     const newMessage = await proccessFunction(message, aesKey);
     setProcessedMessage(newMessage);
+    setIsProcessing(false);
   };
 
   return (
@@ -58,13 +61,18 @@ const MessageProcessor: React.FC<Props> = ({
         dimension={dimension}
         setDimension={setDimension}
       />
-      <button
-        className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition flex items-center justify-center"
-        onClick={handleProcess}
-        disabled={isLoading}
-      >
-        {buttonText}
-      </button>
+      {isProcessing ? (
+        <div className="flex items-center justify-center rounded-lg">
+          <div className="animate-spin h-10 w-10 border-4 border-red-600 border-t-transparent rounded-full" />
+        </div>
+      ) : (
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition flex items-center justify-center"
+          onClick={handleProcess}
+        >
+          {buttonText}
+        </button>
+      )}
       {processedMessage && (
         <div className="w-full flex items-center justify-center flex-wrap gap-4">
           <div className="mt-4 p-2 bg-white rounded-lg shadow-md text-center">
