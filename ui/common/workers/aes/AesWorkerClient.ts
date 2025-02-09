@@ -11,19 +11,31 @@ export default class AesWorkerClient {
     this.remoteApi = Comlink.wrap(worker);
   }
 
-  async loadContract() {
-    return this.remoteApi.loadContract();
+  async loadContracts() {
+    return this.remoteApi.loadContracts();
   }
 
-  async compileContract() {
-    return this.remoteApi.compileContract();
+  async compileAseContract() {
+    return this.remoteApi.compileAseContract();
   }
 
-  async encrypt(message: string, aesKey: string) {
-    return this.remoteApi.encrypt(message, aesKey);
+  async getAesProof(message: string, aesKey: string) {
+    return this.remoteApi.getAesProof(message, aesKey);
   }
 
-  async decrypt(message: string, aesKey: string) {
-    return this.remoteApi.decrypt(message, aesKey);
+  async verifyAesProof(proof: string, message: string, aesKey: string) {
+    return this.remoteApi.verifyAesProof(proof, message, aesKey);
+  }
+
+  async setActiveInstanceToDevnet() {
+    return this.remoteApi.setActiveInstanceToDevnet();
+  }
+
+  async compileVerifierContract() {
+    return this.remoteApi.compileVerifierContract();
+  }
+
+  async verifierInitAndFetch() {
+    return this.remoteApi.verifierInitAndFetch();
   }
 }
