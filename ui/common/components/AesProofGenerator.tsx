@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAesProof } from "../context/aesProofContext";
 import { Proof, SelfProof } from "o1js";
-import { AESPublicInput } from "../../../contracts/build/src/AES/AES";
+import { AESProof, AESPublicInput } from "../../../contracts/build/src/AES/AES";
 
 type Props = {
   message: string;
@@ -18,7 +18,7 @@ const AesProofGenerator: React.FC<Props> = ({
 }) => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [proof, setProof] = useState<
-    | { proof: SelfProof<AESPublicInput, void>; auxiliaryOutput: undefined }
+    | { proof: AESProof; auxiliaryOutput: undefined }
     | undefined
   >(undefined);
   const { aesWorkerClient } = useAesProof();
