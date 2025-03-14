@@ -1,3 +1,5 @@
+# This repository has now been moved [here](https://github.com/scaraven/mina-aes)
+
 # MinAES: Provable AES Encryption on Mina Protocol
 
 MinAES is an innovative project that integrates AES symmetric encryption as a native cryptographic primitive within Mina Protocol’s zk-native blockchain ecosystem. With Mina’s state-of-the-art zero-knowledge proof language, o1js, MinAES generates a concise 22kb proof to verify that a message has been encrypted with AES—without revealing any confidential details. This repository demonstrates both the underlying cryptographic contracts and an interactive UI for seamless deployment and interaction.
